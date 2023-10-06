@@ -26,6 +26,7 @@ const Config = {
         File.writeTo(CONFIG_FILE, JSON.stringify(this._raw, null, 4));
     },
 
+    maxNameLength: 20,
     names: {}
 };
 
@@ -46,6 +47,10 @@ const Command = {
         let customName = args["name"];
         let realName = ori.player?.realName;
         if (realName == null) {
+            return;
+        }
+        if (customName.length > Config.maxNameLength) {
+            out.error("Your name is too long!");
             return;
         }
         if (customName == null) {
