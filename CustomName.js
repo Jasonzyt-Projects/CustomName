@@ -51,13 +51,13 @@ const Command = {
         if (customName == null) {
             delete Config.names[ori.player.realName];
             Config.save();
-            ori.player.setNameTag(realName);
+            ori.player.rename(realName);
             out.success("Your name has been reset!");
             return;
         }
         Config.names[realName] = customName;
         Config.save();
-        ori.player.setNameTag(customName);
+        ori.player.rename(customName);
         out.success("Your name has been set to " + customName);
     }
 };
@@ -72,6 +72,6 @@ Command.setup();
 mc.listen("onJoin", function (player) {
     let name = player.realName;
     if (Config.names[name] != null) {
-        player.setNameTag(Config.names[name]);
+        player.rename(Config.names[name]);
     }
 });
