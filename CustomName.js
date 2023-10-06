@@ -29,8 +29,49 @@ const Config = {
     names: {}
 };
 
+const Command = {
+    setup() {
+        let cmd = mc.newCommand("setname", "Set your custom name!", PermType.Any);
+        cmd.setAlias("sn");
+        cmd.optional("name", ParamType.RawText);
+        cmd.overload(["name"]);
+        cmd.setCallback(Command.execute);
+        cmd.setup();
+    },
+    execute(_cmd, ori, out, args) {
+        if (ori.player == null) {
+            out.error("This command can only be executed by player!");
+            return;
+        }
+        let customName = args["name"];
+        let realName = ori.player?.realName;
+        if (realName == null) {
+            return;
+        }
+        if (customName == null) {
+            delete Config.names[ori.player.realName];
+            Config.save();
+            ori.player.setNameTag(realName);
+            out.success("Your name has been reset!");
+            return;
+        }
+        Config.names[realName] = customName;
+        Config.save();
+        ori.player.setNameTag(customName);
+        out.success("Your name has been set to " + customName);
+    }
+};
+
 if (File.exists(PLUGIN_DIR)) {
     File.mkdir(PLUGIN_DIR);
 }
 
 Config.load();
+Command.setup();
+
+mc.listen("onJoin", function (player) {
+    let name = player.realName;
+    if (Config.names[name] != null) {
+        player.setNameTag(Config.names[name]);
+    }
+});
